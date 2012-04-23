@@ -1,0 +1,7 @@
+app=
+{	id = "com.trickplay.canvasApp",
+	release = "1",
+	version = "1.0",
+	name = "Canvas App",
+	copyright = "Trickplay Inc."
+}
