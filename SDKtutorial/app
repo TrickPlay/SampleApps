@@ -1,0 +1,9 @@
+	-- TrickPlay SDK Tutorial's app Metadata File
+	
+	app = {
+		name = "SDK Tutorial",
+		version = "1.0",
+		release = "1",
+		id = "com.trickplay.sdk.tutorial"
+	}
+
