@@ -13,6 +13,8 @@ This repository contains all the source code and resource files described in the
 	menu_multilevel		Multi-Level Menus	
 	assets3D			Using 3D Assets
 	video_run			Run a Video
+	
+	SDKtutorial			TrickPlay SDK Tutorial
 
 The files may by accessed in the following manners:
 
