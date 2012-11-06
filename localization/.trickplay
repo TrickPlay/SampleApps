@@ -1,0 +1,5 @@
+	-- .trickplay definitions to specify the active language
+	-- Note: Only one definition should be specified; any others should be commented out
+	system_language="en"		-- English
+	--system_language="fr"		-- French
+	--system_language="es"		-- Spanish

@@ -25,13 +25,13 @@ TEXT_POS_Y						= 175						-- final Y coordinate of first character
 	gSpotlight2					= nil		-- Clone generated from gSpotlight1
 	gTrickPlayStr				= {}		-- Array of characters
 	gLoopingTimeline			= nil		-- Timeline object used to loop animation
-	
+
 -- *********************************************************
 function
 displayMainScreen()
 
 	local mainScreen = nil
-	
+
 	-- Load the background screen
 	mainScreen = Image( { name = "MainScreen",
 	                      src  = MAIN_BACKGROUND_IMAGE,
@@ -42,7 +42,7 @@ displayMainScreen()
 		return
 	end
 	screen:add( mainScreen )
-	
+
 	-- Define a Group object that covers the screen area between the title and footer areas
 	-- Note: All objects outside this area will be clipped
 	gDisplayArea = Group( { position = { 0, 145 },
@@ -58,7 +58,7 @@ createTrickPlayString()
 
 	local	TEXT_FONT			= "FreeSans Bold 280px"
 	local	SPACING				= (-10)					-- number of pixels between characters
-	
+
 	-- Initial positions (off-screen) for each character
 	local	POSITIONS			= { { -200,  750 },		-- "T"
 	                                {  200, -350 },		-- "r"
@@ -70,12 +70,12 @@ createTrickPlayString()
 	                                { 2120,  400 },		-- "a"
 	                                { 2120,    0 },		-- "y"
 	                              }
-	                              
+
 	local	i					= nil
 	local	currHeight			= 0
 	local	maxHeight			= 0
 	local	currLen				= 0
-	
+
 	-- Each element in the gTrickPlayStr table can be referenced by using the
 	-- element's character from the string "TrickPlay," as in gTrickPlayStr.T
 	-- or gTrickPlayStr.r or gTrickPlayStr[ "T" ] or gTrickPlayStr[ "r" ]
@@ -97,21 +97,21 @@ createTrickPlayString()
 
 		-- Save X offset of this character from the left-most position
 		gTrickPlayStr[ TP_STR[ i ] ].offsetX = currLen
-		
+
 		-- Save the character's offscreen starting X,Y coordinates
 		gTrickPlayStr[ TP_STR[ i ] ].homeX = POSITIONS[ i ][ 1 ]
 		gTrickPlayStr[ TP_STR[ i ] ].homeY = POSITIONS[ i ][ 2 ]
-		
+
 		-- Add the width of this character to the current length
 		currLen = currLen + gTrickPlayStr[ TP_STR[ i ] ].textObj.width + SPACING
-		
+
 		-- Is this character the largest in height so far?
 		currHeight = gTrickPlayStr[ TP_STR[ i ] ].textObj.height
 		if( currHeight > maxHeight )then
 			-- Yes, save this height
 			maxHeight = currHeight
 		end
-		
+
 		-- Add the Text character to the display area
 		gDisplayArea:add( gTrickPlayStr[ TP_STR[ i ] ].textObj )
 	end
@@ -129,9 +129,9 @@ function
 createResources()
 
 	local	SCALE_FACTOR	= (1.5)
-	
+
 	local	spotlight		= nil
-	
+
 	-- Create semi-transparent circular spotlights
 	-- First, create a Canvas object
 	spotlight = Canvas( SPOTLIGHT_DIAMETER, SPOTLIGHT_DIAMETER )
@@ -144,16 +144,16 @@ createResources()
 	-- Convert it to an Image object
 	gSpotlight1      = spotlight:Image()
 	gSpotlight1.name = "Spotlight1"
-	
+
 	-- Scale it along the X-axis to make it an oval and add it to the display area
 	gSpotlight1.scale = { SCALE_FACTOR, 1.0 }
 	gDisplayArea:add( gSpotlight1 )
-	
+
 	-- Create the second spotlight by cloning the first
 	gSpotlight2       = Clone( { name = "Spotlight2", source = gSpotlight1 } )
 	gSpotlight2.scale = { SCALE_FACTOR, 1.0 }
 	gDisplayArea:add( gSpotlight2 )
-	
+
 	-- Create "TrickPlay" string of individual characters
 	createTrickPlayString()
 
@@ -174,15 +174,15 @@ charAnimationFinished( charAnimation )
 
 	-- The charAnimation argument is the Timeline object associated with the
 	-- Animator defined in the animateCharacters() function.
-	
+
 	-- At this point, both the Character and the Spotlight animations have completed.
 	-- Now we will start another animation that loops indefinitely and changes
 	-- the colors of the characters.
-	
+
 	local		i				= 0
 	local		props			= {}
 	local		colorChars		= nil
-	
+
 	-- Create the Animator's table of properties for assignment in the Animator constructor
 	for i = 1, #TP_STR do
 		-- Create properties table entry and add it to the props table
@@ -194,7 +194,7 @@ charAnimationFinished( charAnimation )
 		                                }
 		} )
 	end
-	
+
 	-- Create the Animator's associated Timeline object which will be used to loop
 	-- the animation infinitely.
 	-- Note: This variable must be global because if the animation sequence is run again,
@@ -202,14 +202,14 @@ charAnimationFinished( charAnimation )
 	gLoopingTimeline = Timeline( { loop = true,
 	                               duration = 10000,
 	} )
-	
+
 	-- Create the Animator
 	colorChars = Animator( {
 					duration   = 10000,
 					timeline   = gLoopingTimeline,		-- Loops the animation infinitely
 					properties = props,
 	} )
-	
+
 	-- Start the animation
 	colorChars:start()
 
@@ -223,14 +223,14 @@ animateCharacters()
 	local		props			= {}
 	local		animateChars	= nil
 	local		doneTimeline	= nil
-	
-	
+
+
 	-- Create the Animator's table of properties for assignment in the Animator constructor
 	for i = 1, #TP_STR do
 		-- Position characters offscreen
 		gTrickPlayStr[ TP_STR[ i ] ].textObj.x = gTrickPlayStr[ TP_STR[ i ] ].homeX
 		gTrickPlayStr[ TP_STR[ i ] ].textObj.y = gTrickPlayStr[ TP_STR[ i ] ].homeY
-		
+
 		-- Create properties table entry and add it to the props table
 		table.insert( props, { source = gTrickPlayStr[ TP_STR[ i ] ].textObj,
 		                       name   = "position",
@@ -241,10 +241,12 @@ animateCharacters()
 		                                }
 		} )
 	end
-	
+
 	-- Create the Animator's associated Timeline object which will be used to start another
-	-- animation after the character animation is finished.
-	doneTimeline = Timeline( { on_completed = charAnimationFinished } )
+	-- animation after the character animation is finished. This requires registering an
+	-- on_completed event handler.
+	doneTimeline = Timeline()
+	doneTimeline:add_oncompleted_listener( charAnimationFinished )
 
 	-- Create the Animator
 	animateChars = Animator( {
@@ -252,10 +254,10 @@ animateCharacters()
 					timeline   = doneTimeline,	-- Receives notification when the animation is finished
 					properties = props,
 	} )
-	
+
 	-- Start animating the characters
 	animateChars:start()
-	
+
 end
 
 -- *********************************************************
@@ -268,12 +270,12 @@ animateSpotlights()
 	local	SPOT2_Y			= (0 - SPOTLIGHT_DIAMETER)
 
 	local	animateSpots	= nil
-	
+
 	-- Initialize spotlights' starting positions
 	gSpotlight1.position = { SPOT1_X, SPOT1_Y }
 	gSpotlight2.position = { SPOT2_X, SPOT2_Y }
-	
-	animateSpots = Animator( { 
+
+	animateSpots = Animator( {
 					duration = 500,
 					properties = {
 						{ source = gSpotlight1,
@@ -292,7 +294,7 @@ animateSpotlights()
 						},
 					}
 	} )
-						  
+
 	-- Start animating the spotlights
 	animateSpots:start()
 end
@@ -302,17 +304,17 @@ function
 performAnimation()
 
 	-- If replaying the animation, stop the looping animation
-	-- This is necessary to block a hanging reference to the Timeline object from 
+	-- This is necessary to block a hanging reference to the Timeline object from
 	-- existing and, thereby, preventing the object from being garbage-collected.
 	if( gLoopingTimeline ~= nil )then
 		gLoopingTimeline:stop()
 	end
-	
+
 	-- Animate the characters into position
 	-- Note: Runs asynchronously; when this function returns, the animation will
 	-- still be running.
 	animateCharacters()
-		
+
 	-- Animate the spotlights on the characters
 	-- Note: This animation runs concurrently with the character animation.
 	animateSpotlights()
@@ -324,13 +326,13 @@ end
 
 	-- Show the main background screen
 	displayMainScreen()
-	
+
 	-- Create the resources that will be animated
 	createResources()
-	
+
 	-- Show the screen
 	screen:show()
-	
+
 	-- Perform the animation
 	performAnimation()
 
