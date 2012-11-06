@@ -30,15 +30,15 @@ RIGHTBOX_INIT_Y			= LEFTBOX_INIT_Y
 
 	gLeftBox			= nil
 	gLeftShadow			= nil
-	
+
 	gMiddleBox			= nil
 	gMiddleShadow		= nil
-	
+
 	gRightBox			= nil
 	gRightShadow		= nil
 
 	gBoxStates			= nil		-- AnimationState object
-	
+
 -- *********************************************************
 -- Table of handlers for keystroke input
 
@@ -61,7 +61,7 @@ openBoxLeft()
 		gBoxStates.state = "Middle"
 	end
 	-- Note: If we're at the Left, ignore the keystroke
-	
+
 end
 
 -- *********************************************************
@@ -71,13 +71,13 @@ openBoxRight()
 	-- If we're at the Middle box, move to the Right
 	if( gBoxStates.state == "Middle" )then
 		gBoxStates.state = "Right"
-	
+
 	-- If we're at the Left box, move to the Middle
 	elseif( gBoxStates.state == "Left" )then
 		gBoxStates.state = "Middle"
 	end
 	-- Note: If we're at the Right, ignore the keystroke
-	
+
 end
 
 -- *********************************************************
@@ -85,7 +85,7 @@ function
 displayMainScreen()
 
 	local	mainScreen = nil
-	
+
 	-- Load the main screen image
 	mainScreen = Image( { src = MAIN_SCREEN_IMAGE } )
 	if( mainScreen.loaded == false )then
@@ -111,17 +111,17 @@ initBoxes()
 		exit()
 		return
 	end
-	
+
 	-- Move anchor point to the box's vertical center (along the X-axis)
 	gLeftBox:move_anchor_point( (BOX_WIDTH / 2), 0 )
-	
+
 	-- "Close" this box by rotating it and setting its opacity
 	gLeftBox.y_rotation = { 90, 0, 0 }
 	gLeftBox.opacity    = 0
-	
+
 	-- Display the box onscreen
 	screen:add( gLeftBox )
-	
+
 	-- Do the same things for the gMiddleBox and gRightBox
 	gMiddleBox = Image( { name     = "Rembrandt",
 	                      src      = REMBRANDT_IMAGE,
@@ -135,7 +135,7 @@ initBoxes()
 	gMiddleBox:move_anchor_point( (BOX_WIDTH / 2), 0 )
 	-- Leave this box "open," so don't rotate it or change its opacity
 	screen:add( gMiddleBox )
-	
+
 	gRightBox = Image( { name     = "ElGreco",
 	                     src      = EL_GRECO_IMAGE,
 	                     position = { RIGHTBOX_INIT_X, RIGHTBOX_INIT_Y },
@@ -148,7 +148,7 @@ initBoxes()
 	gRightBox:move_anchor_point( (BOX_WIDTH / 2), 0 )
 	gRightBox.y_rotation = { -90, 0, 0 }
 	gRightBox.opacity    = 0
-	screen:add( gRightBox )  
+	screen:add( gRightBox )
 
 	-- Load the left shadow image
 	gLeftShadow = Image( { name = "LeftShadow",
@@ -164,7 +164,7 @@ initBoxes()
 	gLeftShadow.opacity = 0			-- don't show this shadow on start-up
 	gLeftShadow.scale   = { 0, 1 } 	-- scale down so when we do show it, we'll scale it back up
 	screen:add( gLeftShadow )
-	
+
 	-- Load the middle and right shadow image
 	gMiddleShadow = Image( { name = "MiddleShadow",
 	                         src  = SHADOW_MIDDLE_IMAGE,
@@ -179,7 +179,7 @@ initBoxes()
 	gMiddleShadow:move_anchor_point( gMiddleShadow.width / 2, gMiddleShadow.height / 2 )
 	screen:add( gMiddleShadow )
 
-	-- For the right shadow, use a clone of the middle shadow	
+	-- For the right shadow, use a clone of the middle shadow
 	gRightShadow = Clone( { name     = "RightShadow",
 	                        source   = gMiddleShadow,
 	                        position = { 1220, 775 },
@@ -188,7 +188,7 @@ initBoxes()
 	gRightShadow:move_anchor_point( gRightShadow.width / 2, gRightShadow.height / 2 )
 	gRightShadow.scale = { 0, 1 }	-- we'll scale back up when we show it
 	screen:add( gRightShadow )
-	
+
 end
 
 -- *********************************************************
@@ -206,7 +206,7 @@ initAnimationStates()
 	                                  { gMiddleBox,    "opacity", "EASE_IN_QUINT", 0, 0.0, 0.25 },
 	                                  { gMiddleShadow, "opacity", "EASE_IN_QUINT", 0, 0.0, 0.25 },
 	                                  { gMiddleShadow, "scale", { 0, 1 } },
-	                                  { gLeftBox,      "y_rotation", 0 }, 
+	                                  { gLeftBox,      "y_rotation", 0 },
 	                                  { gLeftBox,      "opacity", "EASE_IN_QUAD", 255 },
 	                                  { gLeftShadow,   "opacity", "EASE_IN_QUAD", 255 },
 	                                  { gLeftShadow,   "scale", { 1, 1 } },
@@ -256,12 +256,12 @@ initAnimationStates()
 
 	-- Initialize first state
 	gBoxStates.state = "Middle"
-	
+
 end
 
 -- *********************************************************
 -- Keyhandler
--- Accepts a table of KEY=function()... where KEY is an element from the 
+-- Accepts a table of KEY=function()... where KEY is an element from the
 -- TrickPlay SDK's keys global variable and function() is a function that
 -- processes the keystroke.
 -- Alternatively, the table entry can be KEY="KEY" where "KEY" references
@@ -288,15 +288,15 @@ end
 
 	-- Show the main screen background
 	displayMainScreen()
-	
+
 	-- Create and display Left, Middle and Right boxes that will be animated
 	initBoxes()
-	
+
 	-- Create the AnimationState animations
 	initAnimationStates()
-	
+
 	-- Hook the screen's menu keyboard input to our handlers
-	screen.on_key_down = KeyHandler( keyInputHandler )
+	screen:add_onkeydown_listener( KeyHandler( keyInputHandler ) )
 
 	-- Show the TrickPlay screen
 	screen:show()

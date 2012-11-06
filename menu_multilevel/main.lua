@@ -60,7 +60,7 @@ menuItemLabelFocused    = menuItemRegionUnfocused
 menuTitleColor          = "rgba(255,135,0,255)"
 menuBorderColor         = "rgba(0,79,32,255)"
 prevMenuLabelColor      = menuTitleColor
-movieTitleColor         = menuItemRegionUnfocused 
+movieTitleColor         = menuItemRegionUnfocused
 movieDescColor          = movieTitleColor
 
 
@@ -89,6 +89,8 @@ movieInfoScr = nil			-- group containing MovieInfo screen structure
 moviePoster  = nil			-- movie poster image
 movieTitle   = nil			-- movie title string
 movieDesc    = nil			-- movie description string
+
+currKeyHandler = nil		-- current on_key_down event handler
 
 -- *************************************
 -- Tables of handlers for keystroke input
@@ -126,7 +128,7 @@ displayMainScreen()
 	                            position = { 370, 30 },
 	} )
 	screen:add( headerTitle )
-	
+
 	-- Define a footer region
 	local footerRect = Rectangle( { name = "footerRegion",
 	                                size = { screen.width, footerHeight },
@@ -146,7 +148,7 @@ displayMainScreen()
 	if( bckImage.loaded )then
 		screen:add( bckImage )
 	end
-	
+
 	-- Display the TrickPlay 3D Logo in the main region
 	local tpLogo = Image( { name = "TrickPlayLogo",
 	                        src = "images/Logo.png",
@@ -156,7 +158,7 @@ displayMainScreen()
 	if( tpLogo.loaded )then
 		screen:add( tpLogo )
 	end
-	
+
 	-- Show the selection controls. These are shown only in child menus and in
 	-- movieInfo screens, not top-level menu screens.
 	-- Note: The prevMenuGraphic and prevMenuLabel must be global; when a menu
@@ -167,7 +169,7 @@ displayMainScreen()
 	if( prevMenuGraphic.loaded )then
 		screen:add( prevMenuGraphic )
 	end
-	
+
 	prevMenuLabel = Text( { text = "Previous Menu",
 	                        position = { prevMenuLabelX, prevMenuLabelY },
 	                        font = prevMenuLabelFont,
@@ -181,20 +183,20 @@ end  -- displayMainScreen()
 function
 defineMenuLayout()
 
-	-- Build the basic, but empty menu display layout. To display a particular 
+	-- Build the basic, but empty menu display layout. To display a particular
 	-- menu, simply fill its data into this layout.
-	
+
 	-- The global menuTitle will store the menu's title
 	menuTitle = Text( { font     = menuTitleFont,
 	                    color    = menuTitleColor,
 	                    position = { menuTitleX, menuTitleY },
 	} )
 	screen:add( menuTitle )
-	
+
 	-- Build the menu items structure
 	-- This structure will be filled dynamically with the current menu's info
 	-- stored in the global menuItems[] array of tables.
-	
+
 	-- Create a border for the menu region
 	local menuBorder = Canvas( menuWidth  + (menuBorderWidth * 2),
 	                           (menuHeight * maxMenuItems) + (menuBorderWidth * 2) )
@@ -207,7 +209,7 @@ defineMenuLayout()
 	menuBorderI.name = "menuBorder"
 	menuBorderI.position = { menuXorg - menuBorderWidth, menuYorg - menuBorderWidth }
 	screen:add( menuBorderI )
-	
+
 	-- Create the menu background texture. Each menuitem will be displayed on this background.
 	local menuRegionBckgnd = Image( { name = "menuRegionTexture",
 	                                  src  = "images/PaperTintedGreen.png",
@@ -218,23 +220,23 @@ defineMenuLayout()
 	if( menuRegionBckgnd.loaded )then
 		screen:add( menuRegionBckgnd )
 	end
-	
+
 	for menuNum = 1, maxMenuItems do
 		local menuLabel = Text( { font     = menuLabelFont,
 		                          position = { menuXorg + 25,
 		                                       menuYorg + (menuHeight * (menuNum - 1)) + 17 },
 		                          color    = menuItemLabelUnfocused,
 		} )
-		
+
 		-- Add label to global menuItems[]
 		-- menuItems[ #menuItems + 1 ] = { region = menuRegion, label = menuLabel }
 		menuItems[ #menuItems + 1 ] = { label = menuLabel }
-		
+
 		-- Add region and label to screen
 		-- screen:add( menuRegion )
 		screen:add( menuLabel )
 	end
-	
+
 	-- Build the current menuItem "plaque." This plaque will move from menuItem
 	-- to menuItem using simple animation. It will always cover the current
 	-- menuItem.
@@ -243,13 +245,13 @@ defineMenuLayout()
 	                             position = { menuXorg, menuYorg },
 	} )
 	screen:add( currMenuItemGroup )
-	                             
+
 	local currMenuItemRegion = Rectangle( { size     = { menuWidth, menuHeight },
 	                                        position = { 0, 0 },  -- relative to group
 	                                        color    = menuItemRegionFocused,
 	} )
 	currMenuItemGroup:add( currMenuItemRegion )
-	
+
 	currMenuItemLabel = Text( { font     = menuLabelFont,
 	                            position = { currMenuItemRegion.position[ 1 ] + 25,
 	                                         currMenuItemRegion.position[ 2 ] + 17 },
@@ -281,14 +283,14 @@ showMenu( menu, menuItem )
 	for menuNum, menuItem in ipairs( menuItems ) do
 		menuItem.label.text = ""
 	end
-	
+
 	-- Populate each menuItem with its new label
 	for menuNum, menuItem in ipairs( menu.menuItems ) do
 		-- Only process maxMenuItems; any items beyond that number are ignored
 		if( menuNum > maxMenuItems )then
 			do break end
 		end
-		
+
 		-- Populate global menuItems[] with item's label
 		menuItems[ menuNum ].label.text = menuItem.menuText
 	end
@@ -296,7 +298,7 @@ showMenu( menu, menuItem )
 	-- Set the focus to the specified menuitem
 	-- Set plaque's label to current menuItem label
 	currMenuItemLabel.text = menuItems[ menuItem ].label.text
-	
+
 	-- Position the plaque over the current menuItem
 	currMenuItemGroup.position = { menuXorg,
 	                               menuYorg + (menuHeight * (menuItem - 1)) }
@@ -309,19 +311,19 @@ updateDisplayFocus( newFocusOffset )
 
 	-- Move the current menuItem plaque to the new current menuItem
 	-- Use a simple animation that moves from the current position to the new position
-	
+
 	-- Update the global currMenuItem variable
 	currMenuItem = currMenuItem + newFocusOffset
 
 	-- Make plaque's label transparent
 	currMenuItemLabel.opacity = 0
-	
+
 	-- Update the plaque's label
 	currMenuItemLabel.text = menuItems[ currMenuItem ].label.text
 
 	-- Calculate the new position
 	newPos = { menuXorg, menuYorg + (menuHeight * (currMenuItem - 1)) }
-	
+
 	-- Animate the plaque group to the new position, gradually revealing new label
 	currMenuItemGroup:animate( { duration = 200,
 	                             position = newPos,
@@ -343,7 +345,7 @@ moveToPrevMenuItem()
 
 	-- Update the display focus and adjust the global current menuItem variable
 	updateDisplayFocus( -1 )
-	
+
 end  -- moveToPrevMenuItem()
 
 -- *************************************
@@ -354,10 +356,10 @@ moveToNextMenuItem()
 	if( currMenuItem == #currMenu.menuItems )then
 		return
 	end
-	
+
 	-- Update the display focus and adjust the global current menuItem variable
 	updateDisplayFocus( 1 )
-	
+
 end  -- moveToNextMenuItem()
 
 -- *************************************
@@ -368,14 +370,14 @@ moveToPrevMenu()
 	if( currMenu.parentMenu == nil )then
 		return
 	end
-	
+
 	-- Reset current menu and menuItem
 	currMenu     = currMenu.parentMenu
 	currMenuItem = 1
-	
+
 	-- Display new current menu
 	showMenu( currMenu, currMenuItem )
-	
+
 end  -- moveToPrevMenu()
 
 -- *************************************
@@ -405,7 +407,7 @@ defineMovieInfoLayout()
 	                       position = { posterX, posterY },
 	} )
 	movieInfoScr:add( moviePoster )
-	
+
 	-- Movie title string
 	movieTitle = Text( { name = "movieTitle",
 	                     position = { movieTitleX, movieTitleY },
@@ -414,7 +416,7 @@ defineMovieInfoLayout()
 	                     text = "",
 	} )
 	movieInfoScr:add( movieTitle )
-	
+
 	-- Movie description string
 	movieDesc = Text( { name = "movieDescription",
 	                    position = { movieDescX, movieDescY },
@@ -425,7 +427,7 @@ defineMovieInfoLayout()
 	                    text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu mattis sapien. Sed eros mi, convallis et rhoncus non, faucibus sit amet ligula. Aliquam nec mauris non leo vestibulum venenatis eu vitae turpis.\n\nDonec bibendum volutpat orci nec bibendum. Integer dui ante, fermentum non pretium ut, mattis sed nisi. Integer aliquet consequat erat tempus egestas. Nullam adipiscing ligula vitae nibh ullamcorper semper.",
 	} )
 	movieInfoScr:add( movieDesc )
-	
+
 	-- Initially, the movieInfo group and all its children should be hidden
 	movieInfoScr:hide_all()
 
@@ -438,33 +440,33 @@ scalePoster( poster, maxWidth, maxHeight )
 	-- If necessary, scale the poster image (while maintaining its aspect ratio)
 	-- so it fits within the specified width/height.
 	-- Note: Only scales down, never up.
-	
+
 	local scaleWidth  = 1.0
 	local scaleHeight = 1.0
 	local scaleFactor = 1.0
-	
+
 	-- Does the image's width need to be scaled?
 	if( poster.base_size[ 1 ] > maxWidth )then
 		-- Yes, calculate scaling factor
 		scaleWidth = maxWidth / poster.base_size[ 1 ]
 	end
-	
+
 	-- Does the image's height need to be scaled?
 	if( poster.base_size[ 2 ] > maxHeight )then
 		-- Yes, calculate scaling factor
 		scaleHeight = maxHeight / poster.base_size[ 2 ]
 	end
-	
+
 	-- Do we need to scale?
 	if( (scaleWidth < 1.0) or (scaleHeight < 1.0) ) then
 		-- Yes, scale by the smallest scaling factor
 		scaleFactor = math.min( scaleWidth, scaleHeight )
-		
+
 		-- Resize the image
 		poster.size = { poster.base_size[ 1 ] * scaleFactor,
 		                poster.base_size[ 2 ] * scaleFactor }
 	end
-	
+
 end  -- scalePoster()
 
 -- *************************************
@@ -473,25 +475,26 @@ showMovieInfoScreen( movieInfo )
 
 	-- Clear any previous movie info content
 	movieTitle.text = ""
-	
+
 	-- Under normal conditions, the movieDesc string would also be cleared, but
 	-- for this demo app, the string remains constant, so there is no need to update it here.
 	-- movieDesc.text = ""
-	
+
 	-- Load movie's poster image
 	moviePoster.src = movieInfo.image
 	if( moviePoster.loaded )then
 		scalePoster( moviePoster, posterWidth, posterHeight )
 	end
-	
+
 	-- Set movie's title
 	movieTitle.text = movieInfo.title
-	
+
 	-- Show the movieInfo screen/group
 	movieInfoScr:show_all()
-	
+
 	-- Direct user input to the movieInfo handlers
-	screen.on_key_down = KeyHandler( keyInputHandlerMovie )
+	screen:remove_onkeydown_listener( currKeyHandler )
+	currKeyHandler = screen:add_onkeydown_listener( KeyHandler( keyInputHandlerMovie ) )
 
 end  -- showMovieInfoScreen()
 
@@ -504,7 +507,7 @@ selectMenuItem()
 		-- Yes, move to that menu
 		currMenu     = currMenu.menuItems[ currMenuItem ].childMenu
 		currMenuItem = 1
-		
+
 		-- Display new current menu
 		showMenu( currMenu, currMenuItem )
 	else
@@ -522,10 +525,11 @@ selectControl()
 
 	-- Hide the MovieInfo screen and restore the previous menu
 	movieInfoScr:hide_all()
-	
+
 	-- Direct user input back to the menu handler
-	screen.on_key_down = KeyHandler( keyInputHandlerMenu )
-	
+	screen:remove_onkeydown_listener( currKeyHandler )
+	currKeyHandler = screen:add_onkeydown_listener( KeyHandler( keyInputHandlerMenu ) )
+
 end  -- selectControl()
 
 -- *************************************
@@ -570,8 +574,8 @@ currMenuItem = 1
 -- Display the menu
 showMenu( currMenu, currMenuItem )
 
--- Hook the screen's menu keyboard input to our handler
-screen.on_key_down = KeyHandler( keyInputHandlerMenu )
+-- Register the handler and key table with the screen's on_key_down event
+currKeyHandler = screen:add_onkeydown_listener( KeyHandler( keyInputHandlerMenu ) )
 
 -- Show the screen
 screen:show()

@@ -41,7 +41,7 @@ COIN_INIT_X				= (screen.width / 2)
 COIN_INIT_Y				= ((screen.height / 2) + 215)
 
 -- *************************************
--- Note: The positions stored in the following tables are offsets from the coin's 
+-- Note: The positions stored in the following tables are offsets from the coin's
 -- "at rest" position stored in the global variables gCoinRestingX and gCoinRestingY
 
 -- Table of cel position offsets for animating the coin left
@@ -151,25 +151,25 @@ nextCoinFrame( timer )
 
 	-- Advance to the next frame
 	gCoin = gCoin + 1
-	
+
 	-- Position the frame's image
 	gCoinCels[ gCoin ].x = gCoinRestingX + gCoinPos[ gCoin ][ 1 ]
 	gCoinCels[ gCoin ].y = gCoinRestingY + gCoinPos[ gCoin ][ 2 ]
-	
+
 	-- Make the image visible
 	gCoinCels[ gCoin ].opacity = 255
-	
+
 	-- Make the previous image invisible
 	gCoinCels[ gCoin - 1 ].opacity = 0
-	
+
 	-- Was this the last frame in the animation?
 	if( gCoin == NUM_COIN_CELS )then
 		-- Yes, terminate animation
 		timer:stop()
-		
+
 		-- Save current X coordinate as new at-rest location
 		gCoinRestingX = gCoinCels[ gCoin ].x
-		
+
 		-- Did coin reach right or left edge of the screen?
 		if( (gCoinRestingX > (screen.width - (gCoinCels[ NUM_COIN_CELS ].width / 2)))	-- right edge test
 		    or
@@ -177,13 +177,13 @@ nextCoinFrame( timer )
 				-- Yes, move back to the middle of the screen
 				gCoinRestingX = COIN_INIT_X
 		end
-		
+
 		-- Move position of first cel to updated position
 		gCoinCels[ 1 ].x = gCoinRestingX
-		
+
 		-- Re-init cel index
 		gCoin = 1
-		
+
 		-- The first and last cels in our cycle are identical. Replace the last
 		-- with the first on the screen so the next cycle starts with Cel #1.
 		gCoinCels[ 1 ].opacity = 255
@@ -198,7 +198,7 @@ animateCoinLeft()
 
 	-- Assign Left-animation positions to global variable
 	gCoinPos = ANIMATE_COIN_LEFT_POS
-	
+
 	-- Start the animation
 	-- Note: gCoin == 1 at this point, indexing the animation's first cel image
 	-- and position
@@ -212,7 +212,7 @@ animateCoinRight()
 
 	-- Assign Right-animation positions to global variable
 	gCoinPos = ANIMATE_COIN_RIGHT_POS
-	
+
 	-- Start the animation
 	-- Note: gCoin == 1 at this point, indexing the animation's first cel image
 	-- and position
@@ -226,7 +226,7 @@ animateCoinUp()
 
 	-- Assign Up-animation positions to global variable
 	gCoinPos = ANIMATE_COIN_UP_POS
-	
+
 	-- Start the animation
 	-- Note: gCoin == 1 at this point, indexing the animation's first cel image
 	-- and position
@@ -244,10 +244,10 @@ showTwoCels( animationCelPos )
 	-- sequence during development.
 	-- This function is not called during the normal running of the finished
 	-- program.
-	
-	-- The animationCelPos argument is a table containing the offsets (from 
+
+	-- The animationCelPos argument is a table containing the offsets (from
 	-- gCoinRestingX/Y) of each cel's position
-	
+
 	local	i = 5
 	local	j = 6
 
@@ -267,7 +267,7 @@ function
 displayMainScreen()
 
 	local	mainScreen = nil
-	
+
 	-- Load the main screen image
 	mainScreen = Image( { src = MAIN_SCREEN_IMAGE } )
 	if( mainScreen.loaded == false )then
@@ -276,15 +276,15 @@ displayMainScreen()
 		return
 	end
 	screen:add( mainScreen )
-	
-end 
+
+end
 
 -- *********************************************************
 function
 loadCoinAnimationCels()
 
 	local	i = 0
-	
+
 	for i = 1, NUM_COIN_CELS do
 		gCoinCels[ i ] = Image( { src = COIN_CEL_FILENAMES[ i ] } )
 		if( gCoinCels[ i ].loaded == false )then
@@ -292,13 +292,13 @@ loadCoinAnimationCels()
 			exit()
 			return
 		end
-		
+
 		-- Make image invisible until it is needed
 		gCoinCels[ i ].opacity = 0
-		
+
 		-- Place the image's origin in its center
 		gCoinCels[ i ].anchor_point = { gCoinCels[ i ].width / 2, gCoinCels[ i ].height / 2 }
-		
+
 		-- Add image to screen
 		screen:add( gCoinCels[ i ] )
 	end
@@ -312,10 +312,10 @@ initCoinDisplay()
 	-- Position the first coin onscreen and show it
 	gCoinCels[ 1 ].position = { COIN_INIT_X, COIN_INIT_Y }
 	gCoinCels[ 1 ].opacity = 255
-	
+
 	-- We'll also define the animation's Timer now, too, but don't start it
 	gAnimationTimer = Timer( COIN_ANIMATION_FPS )
-	
+
 	-- Define the handler to show the animation's next frame
 	gAnimationTimer.on_timer = nextCoinFrame
 
@@ -323,7 +323,7 @@ end
 
 -- *********************************************************
 -- Keyhandler
--- Accepts a table of KEY=function()... where KEY is an element from the 
+-- Accepts a table of KEY=function()... where KEY is an element from the
 -- TrickPlay SDK's keys global variable and function() is a function that
 -- processes the keystroke.
 -- Alternatively, the table entry can be KEY="KEY" where "KEY" references
@@ -350,24 +350,23 @@ end
 
 	-- Show the main screen
 	displayMainScreen()
-	
+
 	-- Load all the animation's coin cels
 	loadCoinAnimationCels()
-	
+
 	-- Show initial coin
 	initCoinDisplay()
-	
+
 	-- Hook the screen's menu keyboard input to our handlers
-	screen.on_key_down = KeyHandler( keyInputHandler )
+	screen:add_onkeydown_listener( KeyHandler( keyInputHandler ) )
 
 	-- Show the TrickPlay screen
 	screen:show()
-	
+
 	-- Development utility function: Determine animation's cel positions
 	--showTwoCels( ANIMATE_COIN_RIGHT_POS )
-	
+
 	-- Perform program intro
 	animateCoinUp()
 
 -- *********************************************************
-

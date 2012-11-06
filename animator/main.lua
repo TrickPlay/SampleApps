@@ -337,7 +337,7 @@ end
 	performAnimation()
 
 	-- Direct any keystrokes to the performAnimation() function
-	screen.on_key_down = performAnimation
+	screen:add_onkeydown_listener( performAnimation )
 
 -- *********************************************************
 
