@@ -1,0 +1,7 @@
+app=
+{	id = "com.trickplay.SpriteSheetApp",
+	release = "1",
+	version = "1.0",
+	name = "SpriteSheet App",
+	copyright = "Trickplay Inc."
+}
