@@ -306,23 +306,14 @@ loadCoinAnimationCels()
 
 	-- Demonstrate the various methods of creating a SpriteSheet
 	local	fromJSON  = true			-- if false, create in Lua statements
-	local	loadAsync = false			-- if false, load synchronously
 
 	-- Define a SpriteSheet
 	if( fromJSON )then
-		if( loadAsync )then
-			-- Load the JSON map file asynchronously
-			gCoinSprites = SpriteSheet( { map       = COIN_SPRITESHEET,
-										  async     = true,
-			                              on_loaded = coinSpritesLoaded,
-			} )
-		else
-			-- Load the JSON map file synchronously
-			gCoinSprites = SpriteSheet( { map = COIN_SPRITESHEET } )
-			if( gCoinSprites.loaded )then
-				-- Initialize each sprite from the sheet
-				coinSpritesLoaded( gCoinSprites, false )
-			end
+		-- Load the JSON map file synchronously
+		gCoinSprites = SpriteSheet( { map = COIN_SPRITESHEET } )
+		if( gCoinSprites.loaded )then
+			-- Initialize each sprite from the sheet
+			coinSpritesLoaded( gCoinSprites, false )
 		end
 	else
 		-- Define the map file in Lua
