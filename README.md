@@ -11,7 +11,8 @@ This repository contains all the source code and resource files described in the
 	canvas				Using Canvas
 	screen_transitions	Screen Transitions
 	menu_multilevel		Multi-Level Menus	
-	assets3D			Using 3D Assets
+	assets3d			Using 3D Assets
+	assets3dSprites		Using SpriteSheet
 	video_run			Run a Video
 	
 	SDKtutorial			TrickPlay SDK Tutorial
